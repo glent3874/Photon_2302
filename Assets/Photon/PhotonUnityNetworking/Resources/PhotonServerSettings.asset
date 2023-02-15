@@ -40,6 +40,10 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - RPCUpdateSkin
+  - "RPC\u66F4\u65B0\u540D\u7A31"
+  - RPCUpdateName
+  - RPCIsReady
+  - RPCStartGame
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

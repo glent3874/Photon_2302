@@ -23,15 +23,19 @@ public class Lobby : MonoBehaviourPunCallbacks
     [SerializeField] Text 連線狀態;
     [SerializeField] Transform 加入房間按鈕 = null;
     [SerializeField] Transform 離開房間按鈕 = null;
+    [SerializeField] GameObject 開始屏蔽 = null;
 
     public GameObject mainPlayer = null;
     public Player mainPlayerScript = null;
     List<Player> 玩家列表 = new List<Player>();
+    int 準備好的人數 = 0;
     #endregion
 
     #region 事件
     private void Start()
     {
+        PlayerInfoManager.instance.Load();
+
         連線狀態.text = "連線中...";
 
         //利用預設值連接到機房
@@ -135,6 +139,37 @@ public class Lobby : MonoBehaviourPunCallbacks
         {
             玩家列表[i].transform.position = new Vector3(i * 2, 0f, 0f);
         }
+    }
+
+    public void 準備好了()
+    {
+        mainPlayerScript.isReady = true;
+
+        確認是否全都準備好();
+    }
+
+    public void 確認是否全都準備好()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            for (int i = 0; i < 玩家列表.Count; i++)
+            {
+                if (玩家列表[i].isReady == true)
+                {
+                    準備好的人數++;
+                }
+            }
+            if (準備好的人數 >= 玩家列表.Count)
+            {
+                photonView.RPC("RPCStartGame", RpcTarget.AllBuffered);
+            }
+        }
+    }
+
+    [PunRPC]
+    public void RPCStartGame()
+    {
+        開始屏蔽.SetActive(true);
     }
     #endregion
 }
