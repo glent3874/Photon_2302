@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -34,6 +35,8 @@ public class Lobby : MonoBehaviourPunCallbacks
     #region 事件
     private void Start()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
+
         PlayerInfoManager.instance.Load();
 
         連線狀態.text = "連線中...";
@@ -161,6 +164,8 @@ public class Lobby : MonoBehaviourPunCallbacks
             }
             if (準備好的人數 >= 玩家列表.Count)
             {
+                PhotonNetwork.CurrentRoom.IsOpen = false;
+
                 photonView.RPC("RPCStartGame", RpcTarget.AllBuffered);
             }
         }
@@ -170,6 +175,15 @@ public class Lobby : MonoBehaviourPunCallbacks
     public void RPCStartGame()
     {
         開始屏蔽.SetActive(true);
+        Invoke("ToGameplay", 2f);
+    }
+
+    void ToGameplay()
+    {
+        if (PhotonNetwork.IsMasterClient == true) 
+        {
+            SceneManager.LoadScene("Gameplay");
+        }
     }
     #endregion
 }

@@ -8,11 +8,9 @@ using UnityEngine.UI;
 public class Player : MonoBehaviourPunCallbacks
 {
     #region 欄位
-    [SerializeField] List<GameObject> 所有模型 = new List<GameObject>();
-    [SerializeField] Text 名稱 = null;
     [SerializeField] Transform 準備好了 = null;
+    [SerializeField] SetPlayerInfo 換衣服程式 = null;
 
-    int skinID = 0;
     bool newPlayer = true;
     #endregion
 
@@ -23,11 +21,6 @@ public class Player : MonoBehaviourPunCallbacks
 
         if(photonView.IsMine)
         {
-            //Buffered將訊息儲存起來給將來加入的用戶
-            //慎用 非常吃流量
-            photonView.RPC("RPCUpdateSkin", RpcTarget.AllBuffered, 0);
-            更新名稱();
-            PlayerInfoManager.instance.Act_Save += 更新名稱;
             isReady = false;
         }
     }
@@ -35,10 +28,6 @@ public class Player : MonoBehaviourPunCallbacks
     private void OnDestroy()
     {
         Lobby.instance.登記離場(this);
-        if(photonView.IsMine)
-        {
-            PlayerInfoManager.instance.Act_Save -= 更新名稱;
-        }
     }
     #endregion
 
@@ -48,39 +37,7 @@ public class Player : MonoBehaviourPunCallbacks
     /// </summary>
     public void ChangeSkin()
     {
-        if(photonView.IsMine)
-        {
-            skinID += 1;
-            if (skinID >= 所有模型.Count)
-            {
-                skinID = 0;
-            }
-            photonView.RPC("RPCUpdateSkin", RpcTarget.AllBuffered, skinID);
-        }
-    }
-
-    /// <summary>
-    /// 刷新模型
-    /// </summary>
-    [PunRPC]
-    public void RPCUpdateSkin(int _skinID)
-    {
-        this.skinID = _skinID;
-        for (int i = 0; i < 所有模型.Count; i++)
-        {
-            所有模型[i].SetActive(i == _skinID);  
-        }
-    }
-
-    public void 更新名稱()
-    {
-        photonView.RPC("RPCUpdateName", RpcTarget.AllBuffered, PlayerInfoManager.instance.data.nickName);
-    }
-
-    [PunRPC]
-    public void RPCUpdateName(string _nickName)
-    {
-        名稱.text = _nickName;
+        換衣服程式.ChangeSkin();
     }
 
     public bool isReady

@@ -34,6 +34,7 @@ public class PlayerInfoManager
         {
             data = new PlayerData();
             data.nickName = "未命名玩家";
+            data.skin = 0;
         }
         else
         {
@@ -59,5 +60,6 @@ public class PlayerInfoManager
 public struct PlayerData
 {
     [SerializeField] public string nickName;
+    [SerializeField] public int skin;
 }
 #endregion
