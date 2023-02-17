@@ -10,6 +10,7 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     [SerializeField] float speed = 5f;
     [SerializeField] Transform rotateRoot = null;
     [SerializeField] SetPlayerInfo 衣服系統 = null;
+    [SerializeField] float 鏡像動畫緩衝 = 5f;
 
     GameObject 自拍棒 = null;
     Vector3 lastPos = Vector3.zero;
@@ -77,9 +78,23 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     void AniUpdate()
     {
         float 現在的速度達到上限的百分比 = moveSpeed / speed;
-        if (衣服系統.動畫系統 != null) 
+
+        if (photonView.IsMine == false)
         {
-            衣服系統.動畫系統.SetFloat("Speed", 現在的速度達到上限的百分比);
+            鏡像動畫緩衝 = Mathf.Lerp(鏡像動畫緩衝, 現在的速度達到上限的百分比, Time.deltaTime * 5f);
+            if (衣服系統.動畫系統 != null)
+            {
+                衣服系統.動畫系統.SetFloat("Speed", 鏡像動畫緩衝);
+            }
         }
+        else
+        {
+            if (衣服系統.動畫系統 != null)
+            {
+                衣服系統.動畫系統.SetFloat("Speed", 現在的速度達到上限的百分比);
+            }
+        }
+
+        
     }
 }
