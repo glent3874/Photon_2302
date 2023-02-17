@@ -11,6 +11,8 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     [SerializeField] Transform rotateRoot = null;
     [SerializeField] SetPlayerInfo 衣服系統 = null;
     [SerializeField] float 鏡像動畫緩衝 = 5f;
+    [SerializeField] LayerMask 滑鼠可以點擊的圖層;
+    [SerializeField] GameObject 魔法砲彈 = null;
 
     GameObject 自拍棒 = null;
     Vector3 lastPos = Vector3.zero;
@@ -68,6 +70,29 @@ public class PlayerControl : MonoBehaviourPunCallbacks
         Vector3 修正後的move = CameraRotate.instance.transform.TransformDirection(move);
 
         rig.velocity = 修正後的move;
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            RaycastHit raycastHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            bool 是否有點到地板 = Physics.Raycast(ray, out raycastHit, 999, 滑鼠可以點擊的圖層);
+            Vector3 目標位置 = raycastHit.point;
+
+            photonView.RPC("Shoot", RpcTarget.All, this.transform.position + (Vector3.up * 2f), 目標位置);
+        }
+    }
+
+    [PunRPC]
+    void Shoot(Vector3 startPos,Vector3 targetPos,PhotonMessageInfo info)
+    {
+        GameObject 砲彈 = Instantiate(魔法砲彈, startPos, Quaternion.identity);
+
+        double lag多久 = PhotonNetwork.Time - info.SentServerTime;
+
+        BulletControl 砲彈的程式 = 砲彈.GetComponent<BulletControl>();
+
+        砲彈的程式.設定目標(targetPos);
+        砲彈的程式.補償時間((float)lag多久);
     }
 
     void Rotate()

@@ -258,6 +258,10 @@ MonoBehaviour:
   rotateRoot: {fileID: 8245559513120822584}
   "\u8863\u670D\u7CFB\u7D71": {fileID: 1164943541327145630}
   "\u93E1\u50CF\u52D5\u756B\u7DE9\u885D": 5
+  "\u6ED1\u9F20\u53EF\u4EE5\u9EDE\u64CA\u7684\u5716\u5C64":
+    serializedVersion: 2
+    m_Bits: 1
+  "\u9B54\u6CD5\u7832\u5F48": {fileID: 661347502000335189, guid: 8f9b0ad1b295a014dbb71b276ee4378e, type: 3}
 --- !u!114 &1651327068788804504
 MonoBehaviour:
   m_ObjectHideFlags: 0

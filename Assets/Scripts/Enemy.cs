@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using AYENavAI;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class Enemy : AYENavAI<狀態>
 {
@@ -9,6 +11,7 @@ public class Enemy : AYENavAI<狀態>
     [SerializeField] float 視野範圍 = 0f;
     [SerializeField] LayerMask 玩家圖層;
     [SerializeField] Transform target = null;
+    [SerializeField] float 攻擊距離 = 1.5f;
     [SerializeField] float 巡邏移動速度 = 2f;
     [SerializeField] float 狩獵移動速度 = 4f;
     [SerializeField] Animator 動畫 = null;
@@ -16,6 +19,7 @@ public class Enemy : AYENavAI<狀態>
 
     void Awake()
     {
+        AddStatus(狀態.未初始化, 未初始化, 未初始化中, 離開未初始化);
         AddStatus(狀態.待機, 待機, 待機中, 離開待機);
         AddStatus(狀態.巡邏, 巡邏, 巡邏中, 離開巡邏);
         AddStatus(狀態.狩獵, 狩獵, 狩獵中, 離開狩獵);
@@ -24,6 +28,26 @@ public class Enemy : AYENavAI<狀態>
         AddStatus(狀態.死掉, 死掉, 死掉中, 離開死掉);
         AddStatus(狀態.逃跑, 逃跑, 逃跑中, 離開逃跑);
     }
+
+    #region 未初始化
+    void 未初始化()
+    {
+
+    }
+
+    void 未初始化中()
+    {
+        if (PhotonNetwork.IsMasterClient == true)
+        {
+            status = 狀態.待機;
+        }
+    }
+
+    void 離開未初始化()
+    {
+
+    }
+    #endregion
 
     #region 待機
     void 待機()
@@ -48,8 +72,8 @@ public class Enemy : AYENavAI<狀態>
     #region 巡邏
     void 巡邏()
     {
-        動畫.SetBool("是否移動", true);
-        動畫.SetFloat("走路或跑步", 0);
+        IsMove(true);
+        IsWalkOrRun(0);
         speed = 巡邏移動速度;
         Vector3 隨機抽出附近一個可以站的點 = GetRandomXZPos(5f, 3f);
         Goto(隨機抽出附近一個可以站的點, 到目標位置);
@@ -57,7 +81,7 @@ public class Enemy : AYENavAI<狀態>
 
     void 到目標位置()
     {
-        動畫.SetBool("是否移動", false);
+        IsMove(false);
     }
 
     void 巡邏中()
@@ -70,7 +94,7 @@ public class Enemy : AYENavAI<狀態>
 
     void 離開巡邏()
     {
-        動畫.SetBool("是否移動", false);
+        IsMove(false);
         StopGoto();
     }
     #endregion
@@ -78,8 +102,8 @@ public class Enemy : AYENavAI<狀態>
     #region 狩獵
     void 狩獵()
     {
-        動畫.SetBool("是否移動", true);
-        動畫.SetFloat("走路或跑步", 1);
+        IsMove(true);
+        IsWalkOrRun(1);
         speed = 狩獵移動速度;
     }
 
@@ -90,11 +114,16 @@ public class Enemy : AYENavAI<狀態>
         {
             status = 狀態.待機;
         }
+        float 我與目標的距離 = Vector3.Distance(this.transform.position, target.position);
+        if (我與目標的距離 < 攻擊距離)
+        {
+            status = 狀態.攻擊;
+        }
     }
 
     void 離開狩獵()
     {
-        動畫.SetBool("是否移動", false);
+        IsMove(false);
         StopGoto();
     }
     #endregion
@@ -102,7 +131,7 @@ public class Enemy : AYENavAI<狀態>
     #region 攻擊
     void 攻擊()
     {
-        動畫.SetTrigger("普通攻擊");
+        Attack(true);
     }
 
     void 攻擊中()
@@ -115,7 +144,7 @@ public class Enemy : AYENavAI<狀態>
 
     void 離開攻擊()
     {
-        動畫.ResetTrigger("普通攻擊");
+        Attack(false);
     }
     #endregion
 
@@ -170,6 +199,46 @@ public class Enemy : AYENavAI<狀態>
     }
     #endregion
 
+    #region 動畫處理
+    [PunRPC]
+    void IsMove(bool v)
+    {
+        動畫.SetBool("是否移動", v);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("IsMove", RpcTarget.Others, v);
+        }
+    }
+
+    [PunRPC]
+    void IsWalkOrRun(float v)
+    {
+        動畫.SetFloat("走路或跑步", v);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("IsWalkOrRun", RpcTarget.Others, v);
+        }
+    }
+
+    [PunRPC]
+    void Attack(bool v)
+    {
+        if (v == true)
+        {
+            動畫.SetTrigger("普通攻擊");
+        }
+        else
+        {
+            動畫.ResetTrigger("普通攻擊");
+        }
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("Attack", RpcTarget.Others, v);
+        }
+    }
+    #endregion
+
     #region 視線檢定
     protected override void FixedUpdate30()
     {
@@ -191,9 +260,9 @@ public class Enemy : AYENavAI<狀態>
     #endregion
 }
 
-[SerializeField]
 public enum 狀態
 {
+    未初始化,
     待機,
     巡邏,
     狩獵,

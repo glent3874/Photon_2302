@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Photon.Pun;
+using Photon.Realtime;
 
 /// <summary>
 /// <para>基於FSM狀態機設計的AI底層，使用時需在Awake執行AddStatus註冊狀態。</para>
@@ -16,7 +18,7 @@ using System;
 /// <para>FixedUpdate30 : 省效能的通用物理刷新</para>
 /// <para></para>
 /// </summary>
-public class AYEStatusBehaviour<StatusEnum> : MonoBehaviour where StatusEnum : Enum
+public class AYEStatusBehaviour<StatusEnum> : MonoBehaviourPunCallbacks where StatusEnum : Enum
 {
     struct StatusPack
     {
