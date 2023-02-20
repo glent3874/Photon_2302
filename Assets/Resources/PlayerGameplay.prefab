@@ -257,7 +257,7 @@ MonoBehaviour:
   speed: 5
   rotateRoot: {fileID: 8245559513120822584}
   "\u8863\u670D\u7CFB\u7D71": {fileID: 1164943541327145630}
-  "\u93E1\u50CF\u52D5\u756B\u7DE9\u885D": 5
+  "\u93E1\u50CF\u52D5\u756B\u7DE9\u885D": 0
   "\u6ED1\u9F20\u53EF\u4EE5\u9EDE\u64CA\u7684\u5716\u5C64":
     serializedVersion: 2
     m_Bits: 1

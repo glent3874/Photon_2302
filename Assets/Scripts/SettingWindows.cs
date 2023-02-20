@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// ¼È°±µøµ¡
+/// </summary>
 public class SettingWindows : Windows<SettingWindows>
 {
     #region Äæ¦ì

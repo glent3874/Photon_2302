@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 玩家資料存取系統
+/// </summary>
 public class PlayerInfoManager
 {
     #region 單例模式
@@ -27,9 +30,13 @@ public class PlayerInfoManager
     #endregion
 
     #region 方法
+    /// <summary>
+    /// 讀取存檔資料
+    /// </summary>
     public void Load()
     {
-        string 下載的JSON文件 = PlayerPrefs.GetString("PLAYERDATA", "");
+        string 下載的JSON文件 = PlayerPrefs.GetString("PLAYERDATA", "");     //尋找名為"PLAYERDATA"的資料 找不到就回傳""
+        //沒資料就建一個
         if(下載的JSON文件 == "")
         {
             data = new PlayerData();
@@ -42,6 +49,9 @@ public class PlayerInfoManager
         }        
     }
 
+    /// <summary>
+    /// 存檔
+    /// </summary>
     public void Save()
     {
         string 即將存檔的JSON文件 = JsonUtility.ToJson(data);
